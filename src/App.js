@@ -5,7 +5,9 @@ import './App.css';
 
 function App() {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([{ username: 'Joseph', text: 'This is awesome' }, {
+    username: 'Joseph', text: 'I know right!!'
+  }, {}]);
   const [username, setUsername] = useState('');
 
   // useState = Variable in React that can be changed without refreshing. 
@@ -20,7 +22,7 @@ function App() {
   const sendMessage = (event) => {
     // Messaging Logic
     event.preventDefault();
-    setMessages([...messages, input]);
+    setMessages([...messages, { username: username, text: input }]);
     setInput('');
 
   }
@@ -42,7 +44,7 @@ function App() {
       {/* Display Messages */}
       {
         messages.map(message => (
-          <Message text={message} />
+          <Message username={username} message={message} /> //passing props to the messages
         ))
       }
     </div>
