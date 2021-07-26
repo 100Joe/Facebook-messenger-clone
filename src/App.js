@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Button, FormControl, InputLabel, Input } from '@material-ui/core';
 import Message from './Message';
+import db from './firebase';
 import './App.css';
 
 function App() {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([{ username: 'Joseph', text: 'This is awesome' }, {
-    username: 'Joseph', text: 'I know right!!'
-  }, {}]);
+  const [messages, setMessages] = useState([]);
   const [username, setUsername] = useState('');
 
   // useState = Variable in React that can be changed without refreshing. 
-  // useEffect = run code on a condition in React
+  // useEffect = run code on a condition in React. This is a listener. 
+
+  useEffect(() => {
+    db.collection('messages').onSnapshot(snapshot => {
+      setMessages(snapshot.docs.map(doc => doc.data()))
+    });
+  }, [])
 
   useEffect(() => {
     // Run code here
@@ -22,7 +27,7 @@ function App() {
   const sendMessage = (event) => {
     // Messaging Logic
     event.preventDefault();
-    setMessages([...messages, { username: username, text: input }]);
+    setMessages([...messages, { username: username, message: input }]);
     setInput('');
 
   }
