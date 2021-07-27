@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, FormControl, InputLabel, Input } from '@material-ui/core';
 import Message from './Message';
 import db from './firebase';
+import firebase from 'firebase';
+import FlipMove from 'react-flip-move';
 import './App.css';
 
 function App() {
@@ -13,9 +15,11 @@ function App() {
   // useEffect = run code on a condition in React. This is a listener. 
 
   useEffect(() => {
-    db.collection('messages').onSnapshot(snapshot => {
-      setMessages(snapshot.docs.map(doc => doc.data()))
-    });
+    db.collection('messages')
+      .orderBy('timestamp', 'asc')
+      .onSnapshot(snapshot => {
+        setMessages(snapshot.docs.map(doc => doc.data()))
+      });
   }, [])
 
   useEffect(() => {
@@ -27,7 +31,14 @@ function App() {
   const sendMessage = (event) => {
     // Messaging Logic
     event.preventDefault();
-    setMessages([...messages, { username: username, message: input }]);
+
+    db.collection('messages').add({
+      message: input,
+      username: username,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+
+    // setMessages([...messages, { username: username, message: input }]);
     setInput('');
 
   }
@@ -47,11 +58,13 @@ function App() {
       </form>
 
       {/* Display Messages */}
-      {
-        messages.map(message => (
-          <Message username={username} message={message} /> //passing props to the messages
-        ))
-      }
+      <FlipMove>
+        {
+          messages.map(message => (
+            <Message username={username} message={message} /> //passing props to the messages
+          ))
+        }
+      </FlipMove>
     </div>
   );
 }
